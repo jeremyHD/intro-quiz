@@ -1,4 +1,4 @@
-name: Resolve YouTube IDs
+name: Update song data
 
 on:
   workflow_dispatch:
@@ -6,6 +6,7 @@ on:
     paths:
       - data/songs.json
       - scripts/resolve_youtube.py
+      - scripts/fetch_artwork.py
       - .github/workflows/resolve-youtube.yml
 
 permissions:
@@ -25,13 +26,14 @@ jobs:
           python-version: "3.12"
       - run: pip install yt-dlp
       - run: python scripts/resolve_youtube.py
+      - run: python scripts/fetch_artwork.py
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
           git add data/songs.json data/review.csv
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
-          git commit -m "Fill in YouTube IDs [skip ci]"
+          git commit -m "Update song data [skip ci]"
           # Another run may have pushed meanwhile; keep this run's results (it ran on the newer script).
           git pull --rebase -X theirs origin "${GITHUB_REF_NAME}"
           git push

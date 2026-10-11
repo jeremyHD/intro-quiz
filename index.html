@@ -2,52 +2,74 @@
 <html lang="zh-Hant-TW">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>前奏猜歌</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a10">
+  <title>華語秒猜歌</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="app">
     <header class="top">
-      <h1>前奏猜歌</h1>
-      <div class="stats">
-        <span>連勝 <b id="streak">0</b></span>
-        <span>答對 <b id="wins">0</b> / <b id="played">0</b></span>
+      <h1>華語秒猜歌</h1>
+      <div class="stats" aria-label="成績">
+        <span title="總分"><i class="star">★</i><b id="score">0</b></span>
+        <span title="連勝">🔥<b id="streak">0</b></span>
+        <span title="最佳連勝">🏆<b id="best">0</b></span>
       </div>
     </header>
 
-    <ol class="slots" id="slots"></ol>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="難度"></nav>
 
-    <section class="player">
-      <div class="bar" id="bar">
-        <div class="bar-allowed" id="barAllowed"></div>
-        <div class="bar-progress" id="barProgress"></div>
-      </div>
-      <div class="bar-labels"><span>0s</span><span id="limitLabel">1s</span><span>15s</span></div>
+    <div class="steps" id="steps"></div>
+
+    <section class="stage">
       <button class="play" id="playBtn" aria-label="播放" disabled>
-        <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-track" cx="60" cy="60" r="56"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="56"/>
+        </svg>
+        <span class="play-inner">
+          <svg class="icon" viewBox="0 0 24 24" id="playIcon" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+          <span class="clip" id="clipLabel">1<small>s</small></span>
+        </span>
       </button>
       <p class="hint" id="hint">載入中…</p>
     </section>
 
     <section class="guess" id="guessArea">
       <div class="search">
-        <input id="input" type="text" placeholder="輸入歌名或歌手…" autocomplete="off" disabled>
+        <input id="input" type="text" placeholder="輸入歌名或歌手…" autocomplete="off" enterkeyhint="go" disabled>
         <ul class="suggest" id="suggest" hidden></ul>
       </div>
       <div class="actions">
-        <button class="skip" id="skipBtn" disabled>跳過（+<span id="skipSec">1</span>s）</button>
-        <button class="submit" id="submitBtn" disabled>送出</button>
+        <button class="btn skip" id="skipBtn" disabled>跳過</button>
+        <button class="btn submit" id="submitBtn" disabled>送出</button>
       </div>
     </section>
 
-    <section class="result" id="result" hidden>
+    <ol class="attempts" id="attempts"></ol>
+
+    <section class="card" id="result" hidden>
+      <img class="art" id="ansArt" alt="">
       <p class="verdict" id="verdict"></p>
-      <p class="answer"><b id="ansTitle"></b><span id="ansArtist"></span></p>
+      <h2 class="title" id="ansTitle"></h2>
+      <p class="artist" id="ansArtist"></p>
       <p class="album" id="ansAlbum"></p>
-      <button class="next" id="nextBtn">下一題</button>
+      <div class="card-actions">
+        <a class="btn ghost" id="ytLink" target="_blank" rel="noopener">YouTube ↗</a>
+        <button class="btn ghost" id="shareBtn">挑戰朋友</button>
+        <button class="btn primary" id="nextBtn">下一首 ↩</button>
+      </div>
+    </section>
+
+    <section class="howto">
+      <h3>怎麼玩</h3>
+      <p id="howtoText"></p>
+      <p class="credit">音樂由 YouTube 官方音檔提供，專輯封面來自 Apple Music。</p>
     </section>
   </main>
+
+  <div class="toast" id="toast" hidden></div>
 
   <!-- YouTube swaps #yt for its iframe, so the hiding styles live on the wrapper. -->
   <div class="yt" aria-hidden="true"><div id="yt"></div></div>
