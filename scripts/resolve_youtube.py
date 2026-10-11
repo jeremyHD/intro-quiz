@@ -10,7 +10,10 @@ import yt_dlp
 
 SONGS = "data/songs.json"
 REVIEW = "data/review.csv"
-BAD = re.compile(r"\b(mv|m/v|live|cover|karaoke|ktv|lyrics?|remix|reaction)\b|翻唱|現場|演唱會|伴奏|動態歌詞|歌詞版|教學|純音樂", re.I)
+BAD = re.compile(r"(?<![a-z])(mv|m/v|live|cover|karaoke|ktv|lyrics?|remix|reaction|music video|official video|hd|hq)(?![a-z])"
+                 r"|翻唱|現場|现场|演唱會|演唱会|伴奏|歌詞|歌词|字幕|教學|純音樂|高音質|完整版", re.I)
+# Apple's titles sometimes use Japanese kanji or simplified variants.
+VARIANTS = str.maketrans("涙晩説无", "淚晚說無")
 
 
 def norm(s):
@@ -20,8 +23,15 @@ def norm(s):
 
 
 def clean_title(t):
-    # "二十二 (Live)" -> "二十二", "牛頭馬面 (feat. Melo)" -> "牛頭馬面"
-    return re.sub(r"\s*[\(（].*?[\)）]", "", t).strip() or t
+    # "二十二 (Live)" -> "二十二", "親愛的對象 - From THE FIRST TAKE" -> "親愛的對象"
+    t = t.translate(VARIANTS)
+    return re.sub(r"\s*[\(（].*?[\)）]|\s+-\s+.*$", "", t).strip() or t
+
+
+def artist_key(a):
+    # Han part of the name if any ("JOLIN蔡依林" -> "蔡依林"), else the whole name
+    han = "".join(re.findall(r"[\u4e00-\u9fff]+", a))
+    return norm(han or a)
 
 
 def main_artist(a):
@@ -54,7 +64,7 @@ def search(q, n=8):
 
 def pick(song):
     title, artist = clean_title(song["title"]), main_artist(song["artist"])
-    nt = norm(title)
+    nt, ak = norm(title), artist_key(artist)
     results = search(f"{artist} {title} topic") + search(f"{artist} {title} official audio", 5)
     seen = set()
     best = None
@@ -68,7 +78,11 @@ def pick(song):
         if BAD.search(vt) or (dur and (dur < 60 or dur > 600)):
             continue
         title_ok = nt and nt in norm(vt)
-        if ch.endswith("- Topic") and title_ok:
+        topic = ch.endswith("- Topic")
+        # Art tracks (studio audio) are titled exactly as the song, on the Topic or official artist channel.
+        if norm(vt) == nt and (topic or (ak and ak in norm(ch))):
+            score = 4
+        elif topic and title_ok:
             score = 3
         elif title_ok and re.search(r"official audio|audio|官方音[檔档]|官方音频", vt, re.I):
             score = 2
@@ -78,7 +92,7 @@ def pick(song):
             continue
         if (best is None or score > best[0]) and embeddable(vid):
             best = (score, vid, vt, ch)
-            if score == 3:
+            if score == 4:
                 break
     return best
 
@@ -91,7 +105,7 @@ def main():
         best = pick(s)
         if best:
             s["youtubeId"], s["ytTitle"], s["ytChannel"] = best[1], best[2], best[3]
-            s["match"] = {3: "topic", 2: "audio", 1: "other"}[best[0]]
+            s["match"] = {4: "art", 3: "topic", 2: "audio", 1: "other"}[best[0]]
         else:
             s["match"] = "none"
         print(f"[{i}/{len(todo)}] {s['artist']} - {s['title']}: {s['match']} {s.get('youtubeId') or ''}")
@@ -103,7 +117,7 @@ def main():
         w = csv.writer(f)
         w.writerow(["match", "artist", "title", "youtubeId", "ytTitle", "ytChannel"])
         for s in songs:
-            if s.get("match") != "topic":
+            if s.get("match") not in ("art", "topic"):
                 w.writerow([s.get("match"), s["artist"], s["title"], s.get("youtubeId") or "", s.get("ytTitle", ""), s.get("ytChannel", "")])
     counts = {}
     for s in songs:
