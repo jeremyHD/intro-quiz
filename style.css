@@ -95,5 +95,7 @@ button:disabled { cursor: default; opacity: .45; }
 .album { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
 .next { padding: 12px 36px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-weight: 600; }
 
-/* Player has to stay rendered for the YouTube API to work, so keep it off-screen instead of display:none. */
-.yt { position: fixed; left: -9999px; top: 0; width: 200px; height: 200px; opacity: 0; pointer-events: none; }
+/* The player must stay rendered and inside the viewport: browsers pause off-screen or display:none
+   cross-origin iframes, and the YouTube player then never reports ready. Keep it invisible behind the page. */
+.yt { position: fixed; right: 0; bottom: 0; width: 200px; height: 200px; opacity: 0; pointer-events: none; z-index: -1; }
+.yt iframe { width: 100%; height: 100%; }
