@@ -108,7 +108,7 @@ def main():
             s["youtubeId"], s["ytTitle"], s["ytChannel"] = best[1], best[2], best[3]
             s["match"] = {4: "art", 3: "topic", 2: "audio", 1: "other"}[best[0]]
         else:
-            s["match"] = "none"
+            s["youtubeId"], s["match"] = None, "none"
         print(f"[{i}/{len(todo)}] {s['artist']} - {s['title']}: {s['match']} {s.get('youtubeId') or ''}")
         if i % 25 == 0:
             json.dump(songs, open(SONGS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
