@@ -67,7 +67,7 @@ function newRound() {
   $("input").value = "";
   hideSuggest();
   updateStage();
-  $("hint").textContent = "按播放聽前奏";
+  $("hint").textContent = playerReady ? "按播放聽前奏" : "播放器載入中…";
   if (playerReady) player.cueVideoById({ videoId: song.youtubeId, startSeconds: 0 });
 }
 
@@ -161,7 +161,8 @@ function play() {
   }, 50);
 }
 
-window.onYouTubeIframeAPIReady = () => {
+function initPlayer() {
+  if (player) return;
   player = new YT.Player("yt", {
     width: 200,
     height: 200,
@@ -171,6 +172,7 @@ window.onYouTubeIframeAPIReady = () => {
         playerReady = true;
         if (song) player.cueVideoById({ videoId: song.youtubeId, startSeconds: 0 });
         updateStage();
+        if (!done) $("hint").textContent = "按播放聽前奏";
       },
       onError(e) {
         // 100: removed, 101/150: embedding disabled. Drop the song for this session and move on.
@@ -181,7 +183,15 @@ window.onYouTubeIframeAPIReady = () => {
       },
     },
   });
-};
+}
+
+// app.js loads before the API script, but cover the case where the API is already there (cached).
+if (window.YT && YT.Player) initPlayer();
+else window.onYouTubeIframeAPIReady = initPlayer;
+
+setTimeout(() => {
+  if (!playerReady) $("hint").textContent = "YouTube 播放器載不出來，試試重新整理或暫停廣告阻擋外掛";
+}, 15000);
 
 // ---------- search ----------
 function findExact(text) {
