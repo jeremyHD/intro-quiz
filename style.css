@@ -1,0 +1,99 @@
+:root {
+  --bg: #fbf8f3;
+  --surface: #ffffff;
+  --text: #1d1a17;
+  --muted: #7a7168;
+  --line: #e7e0d6;
+  --accent: #e0573a;
+  --accent-soft: #f6d6cc;
+  --good: #2f8f5b;
+  --bad: #c0392b;
+  --skip: #b9b0a5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171513;
+    --surface: #221f1c;
+    --text: #f2ede6;
+    --muted: #9b9188;
+    --line: #36312c;
+    --accent: #ff7a5c;
+    --accent-soft: #4a2b23;
+    --good: #5cc48a;
+    --bad: #ff6b5c;
+    --skip: #5d5650;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .45; }
+
+.app { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; }
+
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.top h1 { font-size: 24px; margin: 0; letter-spacing: .05em; }
+.stats { display: flex; gap: 14px; color: var(--muted); font-size: 14px; }
+.stats b { color: var(--text); }
+
+.slots { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 8px; }
+.slots li {
+  min-height: 42px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface);
+  font-size: 15px; display: flex; align-items: center; gap: 8px;
+}
+.slots li.current { border-color: var(--accent); }
+.slots li.wrong { color: var(--bad); }
+.slots li.skipped { color: var(--muted); }
+.slots li.right { color: var(--good); border-color: var(--good); }
+
+.player { text-align: center; }
+.bar { position: relative; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.bar-allowed { position: absolute; inset: 0 auto 0 0; background: var(--accent-soft); width: 0; transition: width .3s; }
+.bar-progress { position: absolute; inset: 0 auto 0 0; background: var(--accent); width: 0; }
+.bar-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.play {
+  margin: 14px auto 6px; width: 64px; height: 64px; border-radius: 50%;
+  border: none; background: var(--accent); display: grid; place-items: center;
+}
+.play svg { width: 30px; height: 30px; fill: #fff; }
+.hint { color: var(--muted); font-size: 13px; min-height: 18px; margin: 4px 0 16px; }
+
+.search { position: relative; }
+.search input {
+  width: 100%; padding: 12px 14px; font-size: 16px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+}
+.search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.suggest {
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 4px); z-index: 5;
+  list-style: none; margin: 0; padding: 4px; max-height: 260px; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.suggest li { padding: 9px 10px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+.suggest li small { color: var(--muted); margin-left: 6px; }
+.suggest li.active, .suggest li:hover { background: var(--accent-soft); }
+
+.actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; }
+.skip { background: var(--line); color: var(--text); }
+.submit { background: var(--text); color: var(--bg); }
+
+.result { text-align: center; margin-top: 8px; }
+.verdict { font-size: 20px; font-weight: 700; margin: 8px 0; }
+.verdict.good { color: var(--good); }
+.verdict.bad { color: var(--bad); }
+.answer { font-size: 18px; margin: 4px 0; }
+.answer span { color: var(--muted); margin-left: 8px; font-size: 15px; }
+.album { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+.next { padding: 12px 36px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-weight: 600; }
+
+/* Player has to stay rendered for the YouTube API to work, so keep it off-screen instead of display:none. */
+.yt { position: fixed; left: -9999px; top: 0; width: 200px; height: 200px; opacity: 0; pointer-events: none; }

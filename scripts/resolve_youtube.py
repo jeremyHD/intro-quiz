@@ -65,7 +65,7 @@ def search(q, n=8):
 def pick(song):
     title, artist = clean_title(song["title"]), main_artist(song["artist"])
     nt, ak = norm(title), artist_key(artist)
-    results = search(f"{artist} {title} topic") + search(f"{artist} {title} official audio", 5)
+    results = search(f"{artist} {title} topic") + search(f"{artist} {title}", 5) + search(f"{artist} {title} official audio", 5)
     seen = set()
     best = None
     for e in results:
@@ -99,7 +99,8 @@ def pick(song):
 
 def main():
     songs = json.load(open(SONGS, encoding="utf-8"))
-    todo = [s for s in songs if not s.get("youtubeId")]
+    # Low-confidence matches ("other"/"none") are retried on every run.
+    todo = [s for s in songs if not s.get("youtubeId") or s.get("match") in ("other", "none")]
     print(f"{len(todo)} songs to resolve")
     for i, s in enumerate(todo, 1):
         best = pick(s)
