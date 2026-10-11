@@ -6,6 +6,9 @@ const LEVELS = [
   { name: "專家", stages: [0.1, 0.3, 1, 3, 8], mult: 3 },
   { name: "不可能", stages: [0.1, 0.2, 0.5, 1, 2], mult: 5 },
 ];
+// Difficulty tabs are hidden for now; everyone plays this level (the reference design's 0.1 → 15s ladder).
+const SHOW_LEVELS = false;
+const DEFAULT_LEVEL = 2;
 const POINTS = [100, 70, 40, 20, 10]; // by attempt the answer was found on, times the level multiplier
 const RING = 2 * Math.PI * 56;
 
@@ -21,7 +24,7 @@ const store = {
 
 let songs = [];
 let song = null;      // current answer
-let level = Math.min(store.get("level", 0), LEVELS.length - 1);
+let level = SHOW_LEVELS ? Math.min(store.get("level", DEFAULT_LEVEL), LEVELS.length - 1) : DEFAULT_LEVEL;
 let attempt = 0;      // index into stages: how many clips are unlocked, minus one
 let selected = 0;     // which unlocked clip the play button plays
 let done = false;
@@ -85,6 +88,7 @@ function record(win) {
 
 // ---------- rendering ----------
 function renderTabs() {
+  $("tabs").hidden = !SHOW_LEVELS;
   $("tabs").innerHTML = "";
   LEVELS.forEach((l, i) => {
     const b = document.createElement("button");
@@ -147,7 +151,7 @@ function renderHowto() {
   const st = stages().map((s) => `${s} 秒`).join(" → ");
   $("howtoText").textContent =
     `按下播放，只會聽到 ${stages()[0]} 秒的前奏。在搜尋框輸入歌名或歌手，選出答案送出。` +
-    `猜錯或跳過，就會解鎖更長的片段：${st}。越早猜中、難度越高，得分越多。猜完可以把同一首歌傳給朋友挑戰。`;
+    `猜錯或跳過，就會解鎖更長的片段：${st}。越早猜中，得分越多。猜完可以把同一首歌傳給朋友挑戰。`;
 }
 
 // ---------- round ----------
@@ -406,7 +410,7 @@ fetch("data/songs.json")
     songs = all.filter((s) => s.youtubeId && ["art", "topic", "audio"].includes(s.match));
     const params = new URLSearchParams(location.search);
     const shared = songs.find((s) => s.appleId === params.get("s"));
-    if (shared && LEVELS[params.get("d")]) level = +params.get("d");
+    if (SHOW_LEVELS && shared && LEVELS[params.get("d")]) level = +params.get("d");
     if (shared) history.replaceState(null, "", location.pathname);
     renderTabs();
     renderStats();

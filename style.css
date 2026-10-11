@@ -45,6 +45,7 @@ button:disabled { cursor: default; }
   margin: 20px 0 16px; padding: 4px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
 }
+.tabs[hidden] { display: none; }
 .tabs button {
   border: 0; background: none; padding: 9px 0; border-radius: 10px;
   color: var(--muted); font-size: 15px; font-weight: 600; white-space: nowrap;
@@ -52,7 +53,7 @@ button:disabled { cursor: default; }
 .tabs button.on { background: var(--accent); color: #fff; }
 
 /* clip-length steps */
-.steps { display: flex; gap: 6px; }
+.steps { display: flex; gap: 6px; margin-top: 20px; }
 .steps button {
   flex: 1; min-width: 0; padding: 9px 0; border-radius: 10px; font-size: 14px;
   background: var(--panel); border: 1px solid var(--line); color: var(--muted);
