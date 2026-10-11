@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>前奏猜歌</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <h1>前奏猜歌</h1>
+      <div class="stats">
+        <span>連勝 <b id="streak">0</b></span>
+        <span>答對 <b id="wins">0</b> / <b id="played">0</b></span>
+      </div>
+    </header>
+
+    <ol class="slots" id="slots"></ol>
+
+    <section class="player">
+      <div class="bar" id="bar">
+        <div class="bar-allowed" id="barAllowed"></div>
+        <div class="bar-progress" id="barProgress"></div>
+      </div>
+      <div class="bar-labels"><span>0s</span><span id="limitLabel">1s</span><span>15s</span></div>
+      <button class="play" id="playBtn" aria-label="播放" disabled>
+        <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <p class="hint" id="hint">載入中…</p>
+    </section>
+
+    <section class="guess" id="guessArea">
+      <div class="search">
+        <input id="input" type="text" placeholder="輸入歌名或歌手…" autocomplete="off" disabled>
+        <ul class="suggest" id="suggest" hidden></ul>
+      </div>
+      <div class="actions">
+        <button class="skip" id="skipBtn" disabled>跳過（+<span id="skipSec">1</span>s）</button>
+        <button class="submit" id="submitBtn" disabled>送出</button>
+      </div>
+    </section>
+
+    <section class="result" id="result" hidden>
+      <p class="verdict" id="verdict"></p>
+      <p class="answer"><b id="ansTitle"></b><span id="ansArtist"></span></p>
+      <p class="album" id="ansAlbum"></p>
+      <button class="next" id="nextBtn">下一題</button>
+    </section>
+  </main>
+
+  <div id="yt" class="yt" aria-hidden="true"></div>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="app.js"></script>
+</body>
+</html>
